@@ -2,12 +2,32 @@ import pandas as pd
 import numpy as np 
 import matplotlib.pyplot as plt
 
+#reconstruction of my original code that got deleted
+
 df = pd.read_csv('ROIs.xlsx_-_Sheet1_1.csv')
 
-print(df['roi_name'])
+#red only
+dfBackground = df[df["roi_colour"] == " (red)"]
+#delete red and turquois from df
+df = df.drop(df[df["roi_colour"] == " (red)"].index)
+df = df.drop(df[df["roi_colour"] == " (turquois)"].index)
 
-#basic premise:
+#sample_num generation
+df["sample_num"] = df.roi_name.str[6:10]
+dfBackground["sample_num"] = dfBackground.roi_name.str[6:10]
 
-#red is always background
+#map the potassium and lead subtraction
+df['lead_no_background'] = df['Pb_L-mean[ug/cm2]'] - df['sample_num'].map(dfBackground.set_index('sample_num')['Pb_L-mean[ug/cm2]'])
+df['potassium_no_background'] = df['K-mean[ug/cm2]'] - df['sample_num'].map(dfBackground.set_index('sample_num')['K-mean[ug/cm2]'])
 
-#first step: data cleanup
+
+#final calculation
+df["adjusted_lead"] = df["lead_no_background"]/df["potassium_no_background"]
+
+#post-processing for negative values
+df['adjusted_lead'] = df['adjusted_lead'].apply(lambda x : x if x > 0 else 0)
+
+#write to file
+df.to_csv("out.csv")
+
+print(df.head(100))
