@@ -24,10 +24,9 @@ df['potassium_no_background'] = df['K-mean[ug/cm2]'] - df['sample_num'].map(dfBa
 #final calculation
 df["adjusted_lead"] = df["lead_no_background"]/df["potassium_no_background"]
 
-#post-processing for negative values
-df['adjusted_lead'] = df['adjusted_lead'].apply(lambda x : x if x > 0 else 0)
 
 #write to file
 df.to_csv("out.csv")
+dfBackground.to_csv("background_values.csv")
 
 print(df.head(100))
