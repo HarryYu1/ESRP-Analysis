@@ -27,7 +27,7 @@ dfBackground = df[df["roi_colour"] == " (red)"]
 
 #drop rows of turquois and deadtime > 30
 df = df.drop(df[df["roi_colour"] == " (turquois)"].index)
-df = df.drop(df[df['Dead_Time-mean[%]'] > 30].index)
+df = df.drop(df[df['Dead_Time-mean[%]'].astype(float) > 30].index)
 
 #sample_num generation
 dfBackground["sample_num"] = dfBackground.roi_name.str[6:10]
@@ -72,7 +72,9 @@ mappings.insert(5, "potassium_no_background", potassium_mean_list)
 mappings['adjusted_lead'] = mappings['lead_no_background']/mappings['potassium_no_background']
 
 
-#post-process (sort by treatment)
+#post-process (sort by treatment) and dropna
+mappings.dropna()
+mappings = mappings.reset_index(drop=True)
 mappings_by_plant = mappings.sort_values(by=['plant'], ascending=True)
 mappings_by_treatment = mappings.sort_values(by=['treatment'], ascending=True)
 
@@ -85,6 +87,12 @@ mappings_by_treatment = mappings.sort_values(by=['treatment'], ascending=True)
 mappings_by_plant.to_csv('mappings_by_plant.csv')
 mappings_by_treatment.to_csv('mappings_by_treatment.csv')
 
-
-print(mappings_by_plant.head(10))
-print(mappings_by_treatment.head(10))
+print('FULL MAPPINGS: ')
+print('------------------------------------')
+print(mappings.head(24))
+print('SORT BY PLANT: ')
+print('------------------------------------')
+print(mappings_by_plant.head(24))
+print('SORT BY TREATMENT')
+print('------------------------------------')
+print(mappings_by_treatment.head(24))
