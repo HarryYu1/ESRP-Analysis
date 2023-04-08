@@ -25,8 +25,9 @@ dfBackground = df[df["roi_colour"] == " (red)"]
 #dfGreen = df[df["roi_colour"] == " (green)"]
 
 
-#drop rows of turquois
+#drop rows of turquois and deadtime > 30
 df = df.drop(df[df["roi_colour"] == " (turquois)"].index)
+df = df.drop(df[df['Dead_Time-mean[%]'] > 30].index)
 
 #sample_num generation
 dfBackground["sample_num"] = dfBackground.roi_name.str[6:10]
