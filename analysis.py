@@ -45,6 +45,8 @@ df['sample_num'] = df['sample_num'].astype(int)
 
 lead_mean_list = []
 potassium_mean_list = []
+selenium_mean_list = []
+copper_mean_list = []
 for label, Series in mappings.iterrows():
 
     #adjust lead values and average
@@ -65,12 +67,25 @@ for label, Series in mappings.iterrows():
     potassium_mean = np.mean(potassium_values)
     potassium_mean_list.append(potassium_mean)
 
+    #copper
+    copper_values = df.loc[(df['sample_num'] == Series['sample_num'])]['Cu-mean[ug/cm2]'].to_numpy()
+    copper_values = copper_values[copper_values != 0]
+    copper_mean = np.mean(copper_values)
+    copper_mean_list.append(copper_mean)
+
+    #selenium
+    selenium_values = df.loc[(df['sample_num'] == Series['sample_num'])]['Se-mean[ug/cm2]'].to_numpy()
+    selenium_values = selenium_values[selenium_values != 0]
+    selenium_mean = np.mean(selenium_values)
+    selenium_mean_list.append(selenium_mean)
+
 
 #insert into mappings
 mappings.insert(4, "lead_no_background", lead_mean_list)
 mappings.insert(5, "potassium_no_background", potassium_mean_list)
+mappings.insert(6, "copper", copper_mean_list)
+mappings.insert(7, "selenium", selenium_mean_list)
 mappings['adjusted_lead'] = mappings['lead_no_background']/mappings['potassium_no_background']
-
 
 #post-process (sort by treatment) and dropna
 mappings.dropna()
