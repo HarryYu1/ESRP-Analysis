@@ -16,8 +16,12 @@ import matplotlib.pyplot as plt
 
 #reconstruction of my original code that got deleted
 
+#open sheets, also append the missing rois
 df = pd.read_csv('ROIs.xlsx_-_Sheet1_1.csv')
+dfmissing = pd.read_csv('ROIs42-72_-_Sheet1_1.csv')
 mappings = pd.read_csv('ADJUST_BG - Sheet1.csv')
+df = pd.concat([df, dfmissing])
+
 
 #red only
 dfBackground = df[df["roi_colour"] == " (red)"]
@@ -40,6 +44,7 @@ dfBackground['sample_num'] = dfBackground['sample_num'].astype(int)
 df['sample_num'] = df['sample_num'].astype(int)
 #dfGreen['sample_num'] = dfGreen['sample_num'].astype(int)
 
+
 #subtract based off of values in ADJUST_BG
 #there will be both a green column and a blue column
 
@@ -58,10 +63,10 @@ for label, Series in mappings.iterrows():
 
     #DO NOT subtract the background from the control
     if 'Control' in Series['treatment']:
-        print('control: ' + Series['treatment'])
+        #print('control: ' + Series['treatment'])
         potassium_values = df.loc[(df['sample_num'] == Series['sample_num'])]['K-mean[ug/cm2]'].to_numpy()
     else:
-        print('not control: ' + Series['treatment'])
+        #print('not control: ' + Series['treatment'])
         potassium_values = df.loc[(df['sample_num'] == Series['sample_num'])]['K-mean[ug/cm2]'].to_numpy() - dfBackground.loc[dfBackground['sample_num'] == Series['bg_num_red']]['K-mean[ug/cm2]'].to_numpy().item()
     potassium_values = potassium_values[potassium_values != 0]
     potassium_mean = np.mean(potassium_values)
@@ -92,10 +97,6 @@ mappings.dropna()
 mappings = mappings.reset_index(drop=True)
 mappings_by_plant = mappings.sort_values(by=['plant'], ascending=True)
 mappings_by_treatment = mappings.sort_values(by=['treatment'], ascending=True)
-
-#replaced 72 with 71 due to lack of 71
-#42 with 41 in the series sample num
-
 
 
 #write to file
